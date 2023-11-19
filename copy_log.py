@@ -24,8 +24,11 @@ while True:
         for line in p:
             print("    " + line, file=sio)
         print(file=sio)
+        code = False
         for line in r:
-            if m := re.match(r"#+(.*)", line):
+            if line.startswith("```"):
+                code = not code
+            if not code and (m := re.match(r"#+(.*)", line)):
                 print("**", m.group(1).strip(), "**" ,sep="", file=sio)
             else:
                 print(line, file=sio)
