@@ -1,11 +1,23 @@
-import sys, os, re, io, pyperclip
+import sys, os, re, io, time, pyperclip
 
 if len(sys.argv) != 2:
     print(f"Usage: python {sys.argv[0]} file")
     sys.exit(1)
 
-def waitForNewPaste():
-    ret = pyperclip.waitForNewPaste().replace("\r\n", "\n").split("\n")
+def waitForNewPaste(timeout=0):
+    current = pyperclip.paste()
+    start = time.monotonic()
+    while True:
+        time.sleep(0.1)
+        text = pyperclip.paste()
+        if text != current:
+            return text
+        if timeout > 0 and time.monotonic() - start > timeout:
+            raise pyperclip.PyperclipTimeoutException(
+                f"waitForPaste() timed out after {timeout} seconds.")
+
+def waitForNewPasteLines():
+    ret = waitForNewPaste().replace("\r\n", "\n").split("\n")
     while ret and not ret[-1]:
         ret.pop()
     return ret
@@ -13,9 +25,9 @@ def waitForNewPaste():
 file = sys.argv[1]
 while True:
     print("prompt?")
-    p = waitForNewPaste()
+    p = waitForNewPasteLines()
     print("response?")
-    r = waitForNewPaste()
+    r = waitForNewPasteLines()
     with io.StringIO() as sio:
         if os.path.exists(file):
             print(file=sio)
