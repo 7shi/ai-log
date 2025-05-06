@@ -23,6 +23,7 @@ def waitForNewPasteLines():
     return ret
 
 file = sys.argv[1]
+num = 1
 while True:
     print("prompt?")
     p = waitForNewPasteLines()
@@ -31,7 +32,8 @@ while True:
     with io.StringIO() as sio:
         if os.path.exists(file):
             print(file=sio)
-        print("##", file=sio)
+        print("##", num, file=sio)
+        num += 1
         print(file=sio)
         for line in p:
             print("    " + line, file=sio)
